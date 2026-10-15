@@ -63,6 +63,28 @@ namespace Echo.Tests.Graphing.Analysis.Traversal
                 graph.GetNodeById(1),
             }, recorder.GetTraversal());   
         }
+
+        [Fact]
+        public void EdgeFilterShouldSkipFilteredEdges()
+        {
+            var graph = TestGraphs.CreatePath();
+            var n2 = graph.GetNodeById(2);
+            var n3 = graph.GetNodeById(3);
+
+            // Record a depth first traversal that does not follow the edge from n2 to n3.
+            var traversal = new DepthFirstTraversal
+            {
+                EdgeFilter = edge => edge.Origin != n2 || edge.Target != n3
+            };
+            var recorder = new TraversalOrderRecorder(traversal);
+            traversal.Run(graph.GetNodeById(1));
+
+            Assert.Equal(new[]
+            {
+                graph.GetNodeById(1),
+                n2
+            }, recorder.GetTraversal());
+        }
         
         [Fact]
         public void If()

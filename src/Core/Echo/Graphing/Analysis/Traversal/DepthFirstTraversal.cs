@@ -42,6 +42,15 @@ namespace Echo.Graphing.Analysis.Traversal
             get;
         }
 
+        /// <summary>
+        /// Gets or sets a predicate that decides whether an edge is followed. When <c>null</c>, every edge is followed.
+        /// </summary>
+        public Func<IEdge, bool>? EdgeFilter
+        {
+            get;
+            set;
+        }
+
         /// <inheritdoc />
         public void Run(INode entrypoint)
         {
@@ -68,7 +77,10 @@ namespace Echo.Graphing.Analysis.Traversal
                 {
                     var nextEdges = ReverseTraversal ? node.GetIncomingEdges() : node.GetOutgoingEdges();
                     foreach (var edge in nextEdges)
-                        stack.Push((edge.GetOtherNode(node), edge));
+                    {
+                        if (EdgeFilter == null || EdgeFilter(edge))
+                            stack.Push((edge.GetOtherNode(node), edge));
+                    }
                 }
             }
             
