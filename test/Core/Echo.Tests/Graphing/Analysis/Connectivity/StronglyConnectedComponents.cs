@@ -112,5 +112,26 @@ namespace Echo.Tests.Graphing.Analysis.Connectivity
             Assert.Contains(new HashSet<INode> {nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]}, components);
         }
 
+        [Fact]
+        public void FilterShouldIgnoreNodesAndEdgesOutsideFilter()
+        {
+            var graph = new IntGraph();
+
+            var nodes = new IntNode[4];
+            for (int i = 0; i < nodes.Length; i++)
+                nodes[i] = graph.AddNode(i);
+
+            nodes[0].ConnectWith(nodes[1]);
+            nodes[1].ConnectWith(nodes[0]);
+            nodes[1].ConnectWith(nodes[2]);
+            nodes[2].ConnectWith(nodes[3]);
+            nodes[3].ConnectWith(nodes[2]);
+
+            var components = graph.FindStronglyConnectedComponents(n => n == nodes[0] || n == nodes[1]);
+
+            var component = Assert.Single(components);
+            Assert.Equal(new HashSet<INode> {nodes[0], nodes[1]}, component);
+        }
+
     }
 }
