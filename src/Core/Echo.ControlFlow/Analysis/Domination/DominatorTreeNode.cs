@@ -50,7 +50,7 @@ namespace Echo.ControlFlow.Analysis.Domination
         /// </summary>
         /// <returns>The children, represented by the dominator tree nodes.</returns>
         public IEnumerable<DominatorTreeNode<TInstruction>> GetDirectChildren() =>
-            Children.Where(c => c.Parent!.HasPredecessor(OriginalNode));
+            Children.Where(c => OriginalNode.HasSuccessor(c.OriginalNode));
 
         /// <summary>
         /// Gets a collection of children representing all nodes that were dominated by the original node, but were not
@@ -58,7 +58,7 @@ namespace Echo.ControlFlow.Analysis.Domination
         /// </summary>
         /// <returns>The children, represented by the dominator tree nodes.</returns>
         public IEnumerable<DominatorTreeNode<TInstruction>> GetIndirectChildren() =>
-            Children.Where(c => !c.Parent!.HasPredecessor(OriginalNode));
+            Children.Where(c => !OriginalNode.HasSuccessor(c.OriginalNode));
 
         /// <summary>
         /// Gets all the nodes that are dominated by this control flow graph node.
