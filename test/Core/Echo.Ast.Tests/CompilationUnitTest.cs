@@ -1,3 +1,4 @@
+using Echo.Graphing;
 using Echo.Platforms.DummyPlatform.Code;
 using Xunit;
 
@@ -108,5 +109,31 @@ public class CompilationUnitTest
         
         // Detached expressions should deregister variable use.
         Assert.Empty(variable1.GetIsWrittenBy(unit));
+    }
+
+    [Fact]
+    public void GetDescendantsShouldReturnPreOrder()
+    {
+        var x = new DummyVariable("x");
+        var y = new DummyVariable("y");
+
+        var xExpression = x.ToExpression<DummyInstruction>();
+        var yExpression = y.ToExpression<DummyInstruction>();
+        var inner = Expression.Instruction(DummyInstruction.Op(0, 1, 0), yExpression);
+        var outer = Expression.Instruction(DummyInstruction.Op(0, 2, 0), inner, xExpression);
+        var statement = outer.ToStatement();
+
+        var unit = new CompilationUnit<DummyInstruction>();
+        unit.Root.Statements.Add(statement);
+
+        Assert.Equal(new TreeNodeBase[]
+        {
+            unit.Root,
+            statement,
+            outer,
+            inner,
+            yExpression,
+            xExpression
+        }, unit.GetDescendants());
     }
 }

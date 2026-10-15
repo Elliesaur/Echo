@@ -44,6 +44,37 @@ namespace Echo.Graphing
         /// <returns>The children.</returns>
         public abstract IEnumerable<TreeNodeBase> GetChildren();
 
+        /// <summary>
+        /// Gets all descendants of the current <see cref="TreeNodeBase"/> in pre-order.
+        /// </summary>
+        /// <returns>The descendants.</returns>
+        public IEnumerable<TreeNodeBase> GetDescendants()
+        {
+            var agenda = new Stack<IEnumerator<TreeNodeBase>>();
+            try
+            {
+                agenda.Push(GetChildren().GetEnumerator());
+                while (agenda.Count > 0)
+                {
+                    var enumerator = agenda.Peek();
+                    if (!enumerator.MoveNext())
+                    {
+                        agenda.Pop().Dispose();
+                        continue;
+                    }
+
+                    var child = enumerator.Current;
+                    yield return child;
+                    agenda.Push(child.GetChildren().GetEnumerator());
+                }
+            }
+            finally
+            {
+                foreach (var enumerator in agenda)
+                    enumerator.Dispose();
+            }
+        }
+
         /// <inheritdoc />
         public IEnumerable<IEdge> GetIncomingEdges()
         {
